@@ -25,7 +25,7 @@ public class TfGps {
     private static final String IMUID = "62eTAr";
     private static boolean exitProgram = false;
 
-    private static final double headingOffset = 180.0; //how imu is mounted
+    private static final double headingOffset = 90.0; //how imu is mounted
     private IPConnection ipcon = null;
     private BrickletLCD20x4 lcdBricklet = null;
 
