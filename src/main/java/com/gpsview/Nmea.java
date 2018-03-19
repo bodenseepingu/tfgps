@@ -41,6 +41,60 @@ public class Nmea {
         message = message + "\n";
         return message;
     }
+    
+    
+//    GPRMC
+//Der GPRMC-Datensatz (RMC = recommended minimum sentence C, empfohlener Minimumdatensatz) ist eine Empfehlung für das Minimum, was ein GPS-Empfänger ausgeben soll.
+
+//$GPRMC,191410,A,4735.5634,N,00739.3538,E,0.0,0.0,181102,0.4,E,A*19
+//       ^      ^ ^           ^            ^   ^   ^      ^     ^
+//       |      | |           |            |   |   |      |     |
+//       |      | |           |            |   |   |      |     Neu in NMEA 2.3:
+//       |      | |           |            |   |   |      |     Art der Bestimmung
+//       |      | |           |            |   |   |      |     A=autonomous (selbst)
+//       |      | |           |            |   |   |      |     D=differential
+//       |      | |           |            |   |   |      |     E=estimated (geschätzt)
+//       |      | |           |            |   |   |      |     N=not valid (ungültig)
+//       |      | |           |            |   |   |      |     S=simulator
+//       |      | |           |            |   |   |      |   
+//       |      | |           |            |   |   |      Missweisung (mit Richtung)
+//       |      | |           |            |   |   |     
+//       |      | |           |            |   |   Datum: 18.11.2002     
+//       |      | |           |            |   |        
+//       |      | |           |            |   Bewegungsrichtung in Grad (wahr)
+//       |      | |           |            |
+//       |      | |           |            Geschwindigkeit über Grund (Knoten)
+//       |      | |           |            
+//       |      | |           Längengrad mit (Vorzeichen)-Richtung (E=Ost, W=West)
+//       |      | |           007° 39.3538' Ost
+//       |      | |                        
+//       |      | Breitengrad mit (Vorzeichen)-Richtung (N=Nord, S=Süd)
+//       |      | 46° 35.5634' Nord
+//       |      |
+//       |      Status der Bestimmung: A=Active (gültig); V=void (ungültig)
+//       |
+//       Uhrzeit der Bestimmung: 19:14:10 (UTC-Zeit)
+//   
+     static String rmcMessage(long time, long date, double lat, char nw, double longi, char ew,
+            short status, double heading, double speed) {
+        String message = "";
+        //double timeDouble = time / 1000.0;
+        char fix = (status == 1) ? 'V' : 'A';
+        message = message + String.format(Locale.US, "$GPRMC,000000,%1c,",fix);
+        double latFract = lat % 1;
+        double latDeg = lat - latFract;
+        double longFract = longi % 1;
+        double longDeg = longi - longFract;
+        double latMin = latFract * 60.0;
+        double longMin = longFract * 60.0;
+        message = message + String.format(Locale.US, "%02.0f%02.4f,%1c,", latDeg, latMin, nw);
+        message = message + String.format(Locale.US, "%03.0f%02.4f,%1c,", longDeg, longMin, ew);
+        message = message + String.format(Locale.US, "%3.1f,%3.1f,000000,0.0,E,A*",speed / 1.85,heading);
+        message = message + getSum(message);
+        message = message + "\n";
+        return message;
+    }
+    
 
     static String gsaMessage(short status, double pdop, double hdop, double vdop) {
         String message = "";
@@ -80,6 +134,9 @@ public class Nmea {
         message = message + "\n";
         return message;
     }
+    
+    
+    
 
     static String zdaMessage(long date, long time) {
         //         $GPZDA,201530.00,04,07,2002,00,00*60

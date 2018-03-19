@@ -58,6 +58,29 @@ public class NmeaTest {
         assertEquals(expResult, result);
 
     }
+    
+    /**
+     * Test of rmcMessage method, of class Nmea.
+     */
+    @Test
+    public void testRmcMessage() {
+        System.out.println("rmcMessage");
+        long time = 112734123L;
+        long date = 12345642L;
+        double lat = 47.75;
+        char nw = 'N';
+        double longi = 9.2;
+        char ew = 'E';
+        short status = 2;
+        double heading = 13.7;
+        double speed = 17.2;
+        String expResult = "$GPRMC,000000,A,4745.0000,N,00912.0000,E,9.3,13.7,000000,0.0,E,A*2C\n";
+        String result = Nmea.rmcMessage(time, date, lat, nw, longi, ew,
+            status, heading, speed);
+        assertEquals(expResult, result);
+
+    }
+    
 
     /**
      * Test of gsaMessage method, of class Nmea.
@@ -78,7 +101,7 @@ public class NmeaTest {
      * Test of gsaMessage method, of class Nmea.
      */
     @Test
-    public void testvtgMessage() {
+    public void testVtgMessage() {
         System.out.println("vtgMessage");
         double heading=358.2;
         double speed = 10.0;        
