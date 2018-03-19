@@ -54,6 +54,33 @@ public class Nmea {
         return message;
     }
 
+    static String vtgMessage(double heading, double speed) {
+        //        GPVTG
+        //
+        //Der GPVTG-Datensatz enthält Daten zur Bewegungsgeschwindigkeit und Richtung.
+        //
+        //$GPVTG,0.0,T,359.6,M,0.0,N,0.0,K*47
+        //       ^     ^       ^     ^
+        //       |     |       |     |
+        //       |     |       |     Geschwindigkeit über Grund in km/h (K)
+        //       |     |       |
+        //       |     |       Geschwindigkeit über Grund in Knoten (N)
+        //       |     |      
+        //       |     Kurs (magnetisch, M)     
+        //       |
+        //       Kurs (wahr, T)
+        String message = "";
+        double mheading = heading + 2.4;
+        if (mheading > 360.0) {
+            mheading = mheading - 360.0;
+        }
+        message = message + String.format(Locale.US, "$GPVTG,%3.1f,T,%3.1f,M,%3.1f,N,%3.1f,K*",
+                heading, mheading, speed / 1.85, speed);
+        message = message + getSum(message);
+        message = message + "\n";
+        return message;
+    }
+
     static String zdaMessage(long date, long time) {
         //         $GPZDA,201530.00,04,07,2002,00,00*60
         //
@@ -66,17 +93,17 @@ public class Nmea {
         String message = "";
         Double timeDouble = time / 1000.0;
         message = message + String.format(Locale.US, "$GPZDA,%08.2f,", timeDouble);
-        String timeString = String.format(Locale.US,"%06d",date);
-        message = message + String.format(Locale.US,"%s,%s,20%s,00,00*",
-                timeString.substring(0, 2),timeString.substring(2,4),timeString.substring(4,6));
+        String timeString = String.format(Locale.US, "%06d", date);
+        message = message + String.format(Locale.US, "%s,%s,20%s,00,00*",
+                timeString.substring(0, 2), timeString.substring(2, 4), timeString.substring(4, 6));
         message = message + getSum(message);
         message = message + "\n";
         return message;
     }
-    
+
     static String hdtMessage(double heading) {
         String message = "";
-        message = message + String.format(Locale.US,"$GPHDT,%3.2f,T*", heading);
+        message = message + String.format(Locale.US, "$GPHDT,%3.2f,T*", heading);
         message = message + getSum(message);
         message = message + "\n";
         return message;

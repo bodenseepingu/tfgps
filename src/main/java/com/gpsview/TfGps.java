@@ -24,6 +24,8 @@ public class TfGps {
     private static final String GPSID = "suG";
     private static final String IMUID = "62eTAr";
     private static boolean exitProgram = false;
+
+    private static final double headingOffset = 180.0; //how imu is mounted
     private IPConnection ipcon = null;
     private BrickletLCD20x4 lcdBricklet = null;
 
@@ -45,6 +47,7 @@ public class TfGps {
     private long date;
     private long time;
     private double altitude;
+    private double speed;
     private double geoidSep;
 
     private Mode lcdMode = Mode.NONE;
@@ -105,7 +108,7 @@ public class TfGps {
             ipcon.connect(TFHOST, TFPORT);
             //lcdBrickletInitialize();
             gpsBrickletInitialize();
-            //imuBrickletInitialize();
+            imuBrickletInitialize();
             //create socket for gpsd to send messages
             System.out.println("Starting server listening at port: " + port);
             tcpServer = new TCPServer(port);
@@ -130,10 +133,18 @@ public class TfGps {
                     short[] linearAcceleration,
                     short[] gravityVector,
                     byte temperature, short calibrationStatus) -> {
-                this.gier = eulerAngle[0] / 16.0;
+                double heading = eulerAngle[0] / 16.0;
+                heading = heading - headingOffset;
+                if (heading < 0.0) {
+                    heading = heading + 360.0;
+                }
+
+                if (this.speed < 2.0) { //set heading only when not moving
+                    this.gier = heading;
+                }
                 this.roll = eulerAngle[1] / 16.0;
                 this.nick = eulerAngle[2] / 16.0;
-                //System.out.println("gier: " + this.gier);
+                //System.out.println("gier IMU: " + heading + " nick: " + this.nick + "roll: "+ this.roll);
             });
             imuBrick.setAllDataPeriod(1000);
 
@@ -171,10 +182,17 @@ public class TfGps {
                 this.geoidSep = geoidSep / 10.0;
             });
 
+            gpsBricklet.addMotionListener((long course, long speed) -> {
+                this.speed = speed / 100.0;
+                this.gier = course / 100.0;
+                //System.out.println("gier gps: " + this.gier + " speed gps: " + this.speed);
+            });
+
             gpsBricklet.setCoordinatesCallbackPeriod(1000);
             gpsBricklet.setStatusCallbackPeriod(1000);
             gpsBricklet.setDateTimeCallbackPeriod(1000);
             gpsBricklet.setAltitudeCallbackPeriod(1000);
+            gpsBricklet.setMotionCallbackPeriod(1000);
             gpsBricklet.restart(BrickletGPS.RESTART_TYPE_HOT_START);
 
         } catch (TimeoutException | NotConnectedException ex) {
@@ -275,6 +293,7 @@ public class TfGps {
                 hdop, lat, geoidSep).getBytes());
         tcpServer.sendData(Nmea.gsaMessage(fix, pdop, hdop, vdop).getBytes());
         tcpServer.sendData(Nmea.zdaMessage(date, this.time).getBytes());
+        tcpServer.sendData(Nmea.vtgMessage(this.gier, this.speed).getBytes());
         //tcpServer.sendData(Nmea.hdtMessage(this.gier).getBytes());
         //lcdWriteCoord(47.51, 9.2, 'N', 'W');
     }

@@ -17,22 +17,22 @@ import static org.junit.Assert.*;
  * @author andi
  */
 public class NmeaTest {
-    
+
     public NmeaTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -58,8 +58,7 @@ public class NmeaTest {
         assertEquals(expResult, result);
 
     }
-    
-    
+
     /**
      * Test of gsaMessage method, of class Nmea.
      */
@@ -74,7 +73,19 @@ public class NmeaTest {
         String result = Nmea.gsaMessage(status, pdop, hdop, vdop);
         assertEquals(expResult, result);
     }
-    
+
+    /**
+     * Test of gsaMessage method, of class Nmea.
+     */
+    @Test
+    public void testvtgMessage() {
+        System.out.println("vtgMessage");
+        double heading=358.2;
+        double speed = 10.0;        
+        String expResult = "$GPVTG,358.2,T,0.6,M,5.4,N,10.0,K*74\n";
+        String result = Nmea.vtgMessage(heading,speed);
+        assertEquals(expResult, result);
+    }
 
     /**
      * Test of zdaMessage method, of class Nmea.
@@ -85,7 +96,7 @@ public class NmeaTest {
         long time = 123747123L;
         long date = 170217;
         String expResult = "$GPZDA,123747.12,17,02,2017,00,00*61\n";
-        String result = Nmea.zdaMessage(date,time);
+        String result = Nmea.zdaMessage(date, time);
         assertEquals(expResult, result);
     }
 
@@ -100,7 +111,7 @@ public class NmeaTest {
         String result = Nmea.hdtMessage(heading);
         assertEquals(expResult, result);
     }
-    
+
     @Test
     public void testHdtMessage2() {
         System.out.println("hdtMessage2");
@@ -110,5 +121,4 @@ public class NmeaTest {
         assertEquals(expResult, result);
     }
 
-    
 }
