@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+simple configuration file for log4j2 without additional dependencies (xml) 
+https://logging.apache.org/log4j/log4j-2.3/manual/configuration.html
+M = Usewd to output the method name wher ethe logging request was issued
+WARNING Genrating caller location information is extrmely slow 
+and should be avoided unless execution speed is not an issue.
+-->
+    <Configuration status="WARN">
+      <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+          <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %c{2}.%M - %msg%n"/>
+        </Console>
+        <File name="File" fileName="/tmp/{$env:USERNAME}/contacteditor/logfile.txt">
+          <PatternLayout>
+              <pattern>%d{DEFAULT} [%t] %-5level %c{2}.%M - %msg%n</pattern>
+          </PatternLayout>          
+        </File>
+      </Appenders>
+      <Loggers>
+        <Root level="DEBUG">
+          <!--<AppenderRef ref="Console"/>-->
+          <AppenderRef ref="File"/>
+        </Root>
+      </Loggers>
+    </Configuration>

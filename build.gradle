@@ -1,0 +1,138 @@
+buildscript {
+    repositories {
+        //maven { url 'http://repo01/artifactory/remote-repos' }
+        maven { url '/home/andi/.m2/repository' }
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.0.0'
+        classpath group: 'org.asciidoctor', name: 'asciidoctor-gradle-plugin', version: '1.5.3'
+        classpath group: 'org.asciidoctor', name: 'asciidoctorj-pdf', version: '1.5.0-alpha.11'
+        classpath 'org.ajoberstar:gradle-git:1.4.2'
+    }
+}
+
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'maven-publish'
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'jacoco'
+apply plugin: 'application'
+apply plugin: 'org.asciidoctor.convert'
+
+import org.ajoberstar.grgit.*
+
+group = "com.airbus.ds.sarah.nbe.contacteditior"
+version = "1.0-SNAPSHOT"
+ext {
+    buildNumber = System.getenv("BUILD_NUMBER") as Integer ?: 0
+    isJenkinsBuild = (buildNumber != 0)
+    isSnapshotVersion = version.endsWith("SNAPSHOT")
+}
+
+
+
+dependencies {    
+
+    compile 'com.tinkerforge:tinkerforge:2.1.11'
+    compile 'org.apache.logging.log4j:log4j-api:2.6.2'
+  
+
+    runtime 'org.apache.logging.log4j:log4j-core:2.6.2'
+    testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-3"
+
+    //runtime 'commons-cli:commons-cli:1.2'
+    
+    
+}
+mainClassName = "com.gpsview.TfGps"
+run {
+    if(project.hasProperty("appArgs")){
+        args = [project.appArgs]
+    }
+}
+
+
+jar {
+    from sourceSets.main.output
+    //def repo = Grgit.open(project.file('.'))
+    manifest {
+    	attributes 'Main-Class': mainClassName
+        attributes 'Specification-Title': 'Java ' + project.name
+        attributes 'Specification-Version': project.version
+        attributes 'Specification-Vendor': 'None'
+        attributes 'Implementation-Title': 'Java ' + project.name
+        attributes 'Implementation-Version': buildNumber
+        attributes 'Implementation-Vendor': 'None'
+    }    
+}
+
+sourceSets {
+    main {
+                        
+    }
+}
+
+jacoco {
+    toolVersion = "0.7.5.201505241946"
+}
+
+applicationDefaultJvmArgs = [
+    "-Dtestpackage=contacteditor",
+    "-Dtemp=/tmp",
+    "-Dpropertiesfile=../etc/${project.name}.properties",
+    "-Dlog4j.configurationFile=../etc/log4j2-file.xml",
+]
+
+/**
+ *  @todo application plugin, zipFile soll nicht gebaut werden,
+ *  tgz file ist ausreichend, dies ist input für rpm
+ **/
+distTar {
+    // BZIP2,GZIP,NONE, Default with java plugin: Compression.NONE
+    compression Compression.GZIP
+    archiveName = "${project.name}.tgz"
+} 
+
+task buildRPM (type:Exec, dependsOn: distTar) {
+    description 'Creates a rpm package into the distribution directory.'
+    def mainVersion=project.version as String // default: unspecified
+    def pos = mainVersion.indexOf('-') as int
+    if (pos>=0) {
+        mainVersion = mainVersion.substring(0,pos)
+    }    
+    environment('PROJECT_VERSION',(mainVersion.equals("unspecified")?"0.1.0":mainVersion))
+    environment('PROJECT_NAME', project.name)
+    commandLine './src/rpm/scripts/buildrpm.sh'
+}
+
+assemble.dependsOn(buildRPM)
+
+
+publishing {
+    publications {
+        archives(MavenPublication) {
+            from components.java
+        }
+    }
+}
+artifactory {
+    //contextUrl = "http://repo01/artifactory"
+    contextUrl = "/home/andi/.m2/repository"
+    resolve {
+        repository {
+            repoKey = 'libs-snapshot'
+            maven = true
+        }
+    }
+    publish {
+        repository {
+            repoKey = 'libs-snapshot-local'
+            maven = true
+        }
+        defaults {
+            publications('archives')
+        }
+    }
+}
