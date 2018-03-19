@@ -80,7 +80,8 @@ public class Nmea {
         String message = "";
         //double timeDouble = time / 1000.0;
         char fix = (status == 1) ? 'V' : 'A';
-        message = message + String.format(Locale.US, "$GPRMC,000000,%1c,",fix);
+        long myTime = time / 1000; //cut last 3 digits
+        message = message + String.format(Locale.US, "$GPRMC,%06d,%1c,",myTime,fix);
         double latFract = lat % 1;
         double latDeg = lat - latFract;
         double longFract = longi % 1;
@@ -89,7 +90,7 @@ public class Nmea {
         double longMin = longFract * 60.0;
         message = message + String.format(Locale.US, "%02.0f%02.4f,%1c,", latDeg, latMin, nw);
         message = message + String.format(Locale.US, "%03.0f%02.4f,%1c,", longDeg, longMin, ew);
-        message = message + String.format(Locale.US, "%3.1f,%3.1f,000000,0.0,E,A*",speed / 1.85,heading);
+        message = message + String.format(Locale.US, "%3.1f,%3.1f,%06d,0.0,E,A*",speed / 1.85,heading,date);
         message = message + getSum(message);
         message = message + "\n";
         return message;

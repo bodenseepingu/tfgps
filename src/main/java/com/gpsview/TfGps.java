@@ -296,7 +296,7 @@ public class TfGps {
         tcpServer.sendData(Nmea.gsaMessage(fix, pdop, hdop, vdop).getBytes());
         tcpServer.sendData(Nmea.zdaMessage(date, this.time).getBytes());
         tcpServer.sendData(Nmea.vtgMessage(this.gier, this.speed).getBytes());
-        tcpServer.sendData(Nmea.rmcMessage(0L, date, lat, ns, longi, ew,
+        tcpServer.sendData(Nmea.rmcMessage(this.time, date, lat, ns, longi, ew,
             fix, gier, speed).getBytes());
         //tcpServer.sendData(Nmea.hdtMessage(this.gier).getBytes());
         //lcdWriteCoord(47.51, 9.2, 'N', 'W');
