@@ -5,8 +5,7 @@
  */
 package com.gpsview;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import com.tinkerforge.BrickletGPS;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -34,7 +33,7 @@ public class Nmea {
         double longMin = longFract * 60.0;
         message = message + String.format(Locale.US, "%02.0f%02.4f,%1c,", latDeg, latMin, nw);
         message = message + String.format(Locale.US, "%03.0f%02.4f,%1c,", longDeg, longMin, ew);
-        int fix = (status == 1) ? 0 : 1;
+        int fix = (status == BrickletGPS.FIX_NO_FIX) ? 0 : 1;
         message = message + String.format(Locale.US, "%1d,%02d,", fix, satTracked);
         message = message + String.format(Locale.US, "%.1f,%05.0f,M,,,,*", hdop, alt);
         message = message + getSum(message);
@@ -79,7 +78,7 @@ public class Nmea {
             short status, double heading, double speed) {
         String message = "";
         //double timeDouble = time / 1000.0;
-        char fix = (status == 1) ? 'V' : 'A';
+        char fix = (status == BrickletGPS.FIX_NO_FIX) ? 'V' : 'A';
         long myTime = time / 1000; //cut last 3 digits
         message = message + String.format(Locale.US, "$GPRMC,%06d,%1c,",myTime,fix);
         double latFract = lat % 1;

@@ -25,7 +25,7 @@ public class TfGps {
     private static final String IMUID = "62eTAr";
     private static boolean exitProgram = false;
 
-    private static final double headingOffset = -90.0; //how imu is mounted
+    private static final double HEADINGOFFSET = -90.0; //how imu is mounted
     private IPConnection ipcon = null;
     private BrickletLCD20x4 lcdBricklet = null;
 
@@ -33,11 +33,11 @@ public class TfGps {
     private BrickIMUV2 imuBrick;
 
     private int satUsed = 0;
-    private short satView;
-    private short fix;
-    private double lat = 0.0;
+    private short satView = 0;
+    private short fix = BrickletGPS.FIX_NO_FIX;
+    private double lat = 47.0;
     private char ns = 'N';
-    private double longi = 0.0;
+    private double longi = 9.0;
     private char ew = 'E';
     private double pdop;
     private double hdop;
@@ -134,7 +134,7 @@ public class TfGps {
                     short[] gravityVector,
                     byte temperature, short calibrationStatus) -> {
                 double heading = eulerAngle[0] / 16.0;
-                heading = heading - headingOffset;
+                heading = heading - HEADINGOFFSET;
                 if (heading < 0.0) {
                     heading = heading + 360.0;
                 }
