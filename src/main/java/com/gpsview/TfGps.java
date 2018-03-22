@@ -35,9 +35,9 @@ public class TfGps {
     private int satUsed = 0;
     private short satView = 0;
     private short fix = BrickletGPS.FIX_NO_FIX;
-    private double lat = 47.0;
+    private double lat = 0.0;
     private char ns = 'N';
-    private double longi = 9.0;
+    private double longi = 0.0;
     private char ew = 'E';
     private double pdop;
     private double hdop;
