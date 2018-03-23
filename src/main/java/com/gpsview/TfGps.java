@@ -180,8 +180,9 @@ public class TfGps {
                 this.time = time;
             });
             gpsBricklet.addAltitudeListener((int altitude, int geoidSep) -> {
-                this.altitude = altitude ;
-                this.geoidSep = geoidSep ;
+                this.altitude = altitude / 100.0;
+                this.geoidSep = geoidSep / 100.0;
+                //System.out.println("alt " + this.altitude + " geoidsep " + this.geoidSep);
             });
 
             gpsBricklet.addMotionListener((long course, long speed) -> {
@@ -292,7 +293,7 @@ public class TfGps {
         }
 
         tcpServer.sendData(Nmea.ggaMessage(this.time, lat, ns, longi, ew, fix, (short) satUsed,
-                hdop, lat, geoidSep).getBytes());
+                hdop, altitude, geoidSep).getBytes());
         tcpServer.sendData(Nmea.gsaMessage(fix, pdop, hdop, vdop, (short)satUsed).getBytes());
         tcpServer.sendData(Nmea.zdaMessage(date, this.time).getBytes());
         tcpServer.sendData(Nmea.vtgMessage(this.gier, this.speed).getBytes());
