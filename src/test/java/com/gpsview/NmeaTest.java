@@ -92,8 +92,8 @@ public class NmeaTest {
         double pdop = 1.2;
         double hdop = 2.3;
         double vdop = 3.4;
-        String expResult = "$GPGSA,A,3,04,08,24,32,,,,,,,,,1.2,2.3,3.4*3C\n";
-        String result = Nmea.gsaMessage(status, pdop, hdop, vdop);
+        String expResult = "$GPGSA,A,3,01,02,03,,,,,,,,,,1.2,2.3,3.4*37\n";
+        String result = Nmea.gsaMessage(status, pdop, hdop, vdop,(short)3);
         assertEquals(expResult, result);
     }
 

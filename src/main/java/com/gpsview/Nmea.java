@@ -96,12 +96,20 @@ public class Nmea {
     }
     
 
-    static String gsaMessage(short status, double pdop, double hdop, double vdop) {
+    static String gsaMessage(short status, double pdop, double hdop, double vdop, short satUsed) {
         String message = "";
 
         //$GPGSA,A,3,04,05,,09,12,,,24,,,,,2.5,1.3,2.1*39
         message = message + String.format(Locale.US, "$GPGSA,A,%1d,", status);
-        message = message + String.format(Locale.US, "04,08,24,32,,,,,,,,,%.1f,%.1f,%.1f*",
+        String satString = "";
+        for(int i=0; i<12;i++) {
+            if (i < satUsed) {
+                satString = satString + String.format(Locale.US, "%02d,",i+1);
+            } else {
+                satString = satString + ",";
+            }
+        }
+        message = message + satString + String.format(Locale.US, "%.1f,%.1f,%.1f*",
                 pdop, hdop, vdop);
         message = message + getSum(message);
         message = message + "\n";
