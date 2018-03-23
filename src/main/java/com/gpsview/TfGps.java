@@ -180,8 +180,8 @@ public class TfGps {
                 this.time = time;
             });
             gpsBricklet.addAltitudeListener((int altitude, int geoidSep) -> {
-                this.altitude = altitude / 10.0;
-                this.geoidSep = geoidSep / 10.0;
+                this.altitude = altitude ;
+                this.geoidSep = geoidSep ;
             });
 
             gpsBricklet.addMotionListener((long course, long speed) -> {
