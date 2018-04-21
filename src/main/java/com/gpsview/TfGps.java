@@ -196,7 +196,7 @@ public class TfGps {
             gpsBricklet.setDateTimeCallbackPeriod(1000);
             gpsBricklet.setAltitudeCallbackPeriod(1000);
             gpsBricklet.setMotionCallbackPeriod(1000);
-            gpsBricklet.restart(BrickletGPS.RESTART_TYPE_HOT_START);
+            gpsBricklet.restart(BrickletGPS.RESTART_TYPE_WARM_START);
 
         } catch (TimeoutException | NotConnectedException ex) {
             Logger.getLogger(TfGps.class
